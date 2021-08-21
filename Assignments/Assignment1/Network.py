@@ -4,11 +4,13 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from math import log10, ceil
+# from math import log10, ceil
+# from copy import deepcopy
 
 class Network:
     def __init__(self, width, height, node_size=None):
         self.G = nx.Graph()
+        self.DGs = {"blue":nx.DiGraph(), "red":nx.DiGraph()}
         self.node_size = node_size if node_size is not None else min(width, height)//2
         self.width = width
         self.height = height
@@ -57,26 +59,46 @@ class Network:
         self.G.add_nodes_from([(self.get_id(x,y), {"color": color, "X":x, "Y":y, "agent": agent})])
 
     def add_edge(self, x1,y1, x2,y2, agent, color):
-        self.G.add_edges_from([(self.get_id(x1, y1), self.get_id(x2, y2), {"color":color, "agent":agent})])
-    
+        node1_id = self.get_id(x1, y1)
+        node2_id = self.get_id(x2, y2)
+        self.G.add_edges_from([(node1_id, node2_id, {"color":color, "agent":agent})])
+        self.DGs[agent].add_edges_from([(node1_id, node2_id)])
+
+    def modify_node(self, x, y, agent, color):
+        node_id = self.get_id(x,y)
+        for node in self.G.nodes(data=True):
+            if(node[0] == node_id):
+                deleted_edges = []
+                for edge in self.G.edges(data=True):
+                    if(edge[0] == node_id or edge[1] == node_id):
+                        deleted_edges.append(edge)
+                self.G.remove_edges_from(deleted_edges)
+                node[1]["agent"] = agent
+                node[1]["color"] = color
+                break
+
     def test_update(self):
         self.add_node(0,0, "red", "red")
         self.add_node(1,1, "red", "red")
         self.add_edge(0,0, 1,1, "red")
 
     def find_cycles(self, agent, node):
-        edges = []
-        for edge in self.G.edges(data=True):
-            if(edge[2]["agent"] == agent):
-                edges.append((edge[0], edge[1]))
+        # edges = []
+        # for edge in self.G.edges(data=True):
+        #     if(edge[2]["agent"] == agent):
+        #         edges.append((edge[0], edge[1]))
         
         # print(node_positions)
         # edges = [(0, 0), (0, 1), (0, 2), (1, 2), (2, 0), (2, 1), (2, 2)]#[(5, 5), (6, 5), (7, 5), (8, 5), (5, 9), (6, 9), (7, 9), (8, 9), (5, 6), (5, 7), (5, 8), (9, 5), (9, 6), (9, 7), (9, 8), (9, 9)]
         # edges = node_positions
         # print(edges)
-        G = nx.DiGraph(edges)
+        # G = nx.DiGraph(edges)
+        # copyG = self.G.copy()
+        # copyG.remove_nodes_from([1])
+        # copyG.remove_edges_from([(0, 1)])
+        # len(list(nx.simple_cycles(copyG)))
         try:
-            return list(nx.cycle_basis(G.to_undirected()))
+            return list(nx.cycle_basis(self.DGs[agent].to_undirected()))
             # return list(nx.simple_cycles(G))
             # return list(nx.find_cycle(G, source=node, orientation="ignore"))
             # return list(nx.find_cycle(G, orientation="ignore"))

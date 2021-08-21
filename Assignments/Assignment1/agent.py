@@ -35,8 +35,12 @@ class CycleBot(Bot):
         actions = {}
         center = (self.width//2, self.height//2)
         if(self.steps == 0):
-            small_box, big_box = 2, 4
+            small_box, big_box = 3, 4
+            # actions = {self.agents[1]:[], self.agents[0]:[]}
+            # actions[self.agents[1]].append(center)
+
             actions = {self.agents[0]:[], self.agents[1]:[]}
+
             for i in range(center[0]-small_box, center[0]+small_box):
                 actions[self.agents[0]].append([i, center[1]-small_box])
             for i in range(center[0]-small_box, center[0]+small_box):
@@ -45,6 +49,7 @@ class CycleBot(Bot):
                 actions[self.agents[0]].append([center[0]-small_box, i])
             for i in range(center[1]-small_box, center[1]+small_box+1):
                 actions[self.agents[0]].append([center[0]+small_box, i])
+
 
             for i in range(center[0]-big_box, center[0]+big_box):
                 actions[self.agents[1]].append([i, center[1]-big_box])

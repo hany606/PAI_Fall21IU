@@ -3,4 +3,5 @@
 
 ## TODO:
 
-- [ ] Implment Ray casting algorithm
+- [x] Implment Ray casting algorithm
+- [ ] Create setup.py with dependencies (shapely, numpy, matplotlib ...etc)
