@@ -4,6 +4,7 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 # from math import log10, ceil
 # from copy import deepcopy
 
@@ -19,16 +20,32 @@ class Network:
 
     def create_grid(self):
         ax = plt.gca()
-        for i in range(self.width):
-            ax.plot([i, i], [-1, self.height+1], 'k', linewidth=0.7)
-            # self.add_node(i, -1, "boarders", "green")
-            # self.add_node(i, self.height+1, "boarders", "green")
-            # self.add_edge(i,-1, i, self.height+1, "green")
-        for i in range(self.height):
-            ax.plot([-1, self.width+1], [i, i], 'k', linewidth=0.7)
-            # self.add_node(-1, i, "boarders", "green")
-            # self.add_node(self.width+1, i, "boarders", "green")
-            # self.add_edge(-1, i, self.width+1, i, "green")
+        
+        ax.grid(True, which='both')
+        ax.yaxis.tick_left()
+        ax.tick_params(
+            axis="both",
+            which="both",
+            bottom=False,
+            left=False,
+            labelbottom=True,
+            labelleft=True,
+        )
+        ax.set_xticks([i for i in range(self.width)])
+        ax.set_yticks([i for i in range(self.height)])
+
+
+
+        # for i in range(self.width):
+        #     ax.plot([i, i], [-1, self.height+1], 'k', linewidth=0.7)
+        #     # self.add_node(i, -1, "boarders", "green")
+        #     # self.add_node(i, self.height+1, "boarders", "green")
+        #     # self.add_edge(i,-1, i, self.height+1, "green")
+        # for i in range(self.height):
+        #     ax.plot([-1, self.width+1], [i, i], 'k', linewidth=0.7)
+        #     # self.add_node(-1, i, "boarders", "green")
+        #     # self.add_node(self.width+1, i, "boarders", "green")
+        #     # self.add_edge(-1, i, self.width+1, i, "green")
     
     def create_boarders(self):
         ax = plt.gca()
@@ -47,6 +64,9 @@ class Network:
         # self.add_edge(self.width+1, self.height+1, -1, self.height+1, "green")
         # self.add_edge(self.width+1, self.height+1, self.width+1, -1, "green")
         # self.add_edge(self.width+1, -1, -1, -1, "green")
+
+    def create_axis_text(self):
+        pass
 
     def get_id(self, x, y):
         return f"{x},{y}" #(str(x)+str(y)) -> 11 2 == 1 12
@@ -106,8 +126,6 @@ class Network:
             return []
     
     def draw(self, timeout=0.0001):
-        self.create_boarders()
-        self.create_grid()
         # for node in self.G.nodes(data=True):
         #     print(node)
         #     print(node[1]['X'])
@@ -116,6 +134,9 @@ class Network:
         edge_colors = [f"tab:{edge[2]['color']}" for edge in self.G.edges(data=True)]
         nx.draw_networkx_nodes(self.G, pos=node_positions, node_color=node_colors, node_size=self.node_size)
         nx.draw_networkx_edges(self.G, pos=node_positions, edge_color=edge_colors, width=3)
+        self.create_boarders()
+        self.create_grid()
+
         # Source: https://stackoverflow.com/questions/4098131/how-to-update-a-plot-in-matplotlib
         plt.draw()
         plt.pause(timeout)
