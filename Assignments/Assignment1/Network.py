@@ -138,9 +138,12 @@ class Network:
         self.create_grid()
 
         # Source: https://stackoverflow.com/questions/4098131/how-to-update-a-plot-in-matplotlib
-        plt.draw()
-        plt.pause(timeout)
-        plt.clf()
+        if(timeout < 0):
+            plt.show()
+        else:
+            plt.draw()
+            plt.pause(timeout)
+            plt.clf()
 
 
 

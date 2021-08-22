@@ -26,9 +26,11 @@ class Dots:
         self.turn_counter = 0
         self.num_steps = 0
         self.max_num_step = max_num_step
+        self.node_size = node_size
         self.network = Network(width, height, node_size=node_size)
         self.scores = {a:0 for a in agents}
         self.agents_id = {a:a[0] for a in agents}
+        self.STATE_EMPTY = ""
     
     def other_opponents(self, agent):
         return [a for a in self.agents if a != agent]
@@ -41,11 +43,21 @@ class Dots:
             if(self.agents_id[k] == agent_id):
                 return k
 
+    def get_free_cells(self):
+        free_cells = []
+        for i in range(self.width):
+            for j in range(self.height):
+                if(self.state_matrix[i,j] == self.STATE_EMPTY):
+                    free_cells.append((i,j))
+        return free_cells
+        
     # Note: Must be called at first
     def reset(self):
         self.turn_counter = 0
         self.num_steps = 0
         self.state_matrix = np.zeros((self.width, self.height), dtype=str)
+        self.network = Network(self.width, self.height, node_size=self.node_size)
+        self.scores = {a:0 for a in self.agents}
         return self.get_observation()
 
     def render(self, timeout=0.0001):
@@ -58,12 +70,12 @@ class Dots:
         obs = {"world": self.state_matrix, "turn": self.get_turn()}
         return obs
 
-    def get_reward(self):
+    def get_scores(self):
         return self.scores
 
     # Just for testing 
     def get_done(self):
-        if(self.num_steps >= self.max_num_step):
+        if(self.num_steps >= self.max_num_step or len(self.get_free_cells()) == 0):
             return True
         return False
 
@@ -94,15 +106,16 @@ class Dots:
         self.scores[agent] += 1
         self.state_matrix[point[0], point[1]] = self.get_agent_id(agent)
         self.network.add_node(point[0], point[1], agent, agent)
-        self._add_edges(agent, point, no_update_cycles)
 
-    def _conquer_node(self, agent, point):
+        self._add_edges(agent, point, no_update_cycles=no_update_cycles)
+
+    def _conquer_node(self, agent, point, no_update_cycles=False):
         other_agent = self.get_agent(self.state_matrix[point[0], point[1]])
         self.scores[agent] += 1
         self.scores[other_agent] -= 1
         self.state_matrix[point[0], point[1]] = self.get_agent_id(agent)
         self.network.modify_node(point[0], point[1], agent, agent)
-        self._add_edges(agent, point)
+        self._add_edges(agent, point, no_update_cycles=no_update_cycles)
 
     def _get_coords(self, cycles):
         coords = []
@@ -138,15 +151,18 @@ class Dots:
                         num_intersections += int(intersect(point, [point[0], self.width+1], cycle[k], cycle[k+1]))
                     # Source: https://www.wikiwand.com/en/Point_in_polygon#/Ray_casting_algorithm
                     if(num_intersections % 2 > 0):
-                        print(f"Point: {point} is inside {cycle} for agent {agent}")
-                        print("------------------------------------------------------")
-                        if(self.state_matrix[i, j] == ""):
+                        # print(f"Point: {point} is inside {cycle} for agent {agent}")
+                        # print("------------------------------------------------------")
+
+                        if(self.state_matrix[i, j] == self.STATE_EMPTY):
                             self._add_node(agent, point, no_update_cycles=True)
                         else:
                             self._conquer_node(agent, point)
-                        # if(self.state_matrix[i, j] == "" or self.state_matrix[i, j] == get_agent_id(agent)):
+
+                        # pass
+                        # if(self.state_matrix[i, j] == self.STATE_EMPTY or self.state_matrix[i, j] == get_agent_id(agent)):
                         #     self._conquer_node(agent, point)
-                        # if(self.state_matrix[i, j] == ""):
+                        # if(self.state_matrix[i, j] == self.STATE_EMPTY):
                         #     self._add_node(agent, point)
                         # point = Point(*point)
                         # polygon = Polygon(cycle)
@@ -173,7 +189,7 @@ class Dots:
             # print(actions)
             agent_pos = actions[a]
             for p in agent_pos: # for multiple turns for the agent: just for testing purposes, in the real game, for each agent there is only one turn
-                if(self.state_matrix[p[0], p[1]] == ""):
+                if(self.state_matrix[p[0], p[1]] == self.STATE_EMPTY):
                     self._add_node(a, p)
                     # self._update_cycle(k, p)    # Update the conquer part if there is a cycle
                 else:
@@ -189,15 +205,14 @@ class Dots:
 
     def step(self, actions):
         info = self._update(actions)
-        reward = self.get_reward()
+        scores = self.get_scores()
         done = self.get_done()
         # info = self.get_info(info)
-
-        if(info["error"] == ""):
+        if(info["error"] == ''):
             self.turn_counter += 1
             self.turn_counter %= len(self.agents)
             self.num_steps += 1
         
         obs  = self.get_observation()
 
-        return obs, reward, done, info
+        return obs, scores, done, info
