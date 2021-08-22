@@ -29,7 +29,6 @@ class Bot:
     def plan(self, env):
         print("plan() function is useless for this bot")
 
-# Source: https://cs50.harvard.edu/ai/2020/notes/0/
 class MinMaxBot(Bot):
     max_val = 9999999999
     root = Node(parent=None, children=[], value=-max_val, action=None, best_child=None)
@@ -63,7 +62,8 @@ class MinMaxBot(Bot):
         agent_turn -= 1
         action = {self.agents[agent_turn]: [self.minmax2(env)]}
         return action
-
+    # ------------------------------------------------------------------------------------
+    # For testing only: Based on: https://cs50.harvard.edu/ai/2020/notes/0/, https://github.com/wbsth/cs50ai/blob/master/week0/tictactoe/tictactoe.py
     def _result(self, env_, action_):
         env_copy = deepcopy(env_)
         # print(env_copy.get_turn())
@@ -74,34 +74,32 @@ class MinMaxBot(Bot):
         return env_copy
 
     def _max_value(self, env_):
-        optimal_move = ()
+        optimal_action = ()
         if env_.get_done():
             scores = env_.get_scores()
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
-            return score, optimal_move
-        else:
-            v = self.min_val
-            for action in env_.get_free_cells():
-                minval = self._min_value(self._result(env_,action))[0]
-                if minval > v:
-                    v = minval
-                    optimal_move = action
-            return v, optimal_move
+            return score, optimal_action
+        value = self.min_val
+        for action in env_.get_free_cells():
+            min_value = self._min_value(self._result(env_,action))[0]
+            if min_value > value:
+                value = min_value
+                optimal_action = action
+        return value, optimal_action
 
     def _min_value(self, env_):
-        optimal_move = ()
+        optimal_action = ()
         if env_.get_done():
             scores = env_.get_scores()
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
-            return score, optimal_move
-        else:
-            v = self.max_val
-            for action in env_.get_free_cells():
-                maxval = self._max_value(self._result(env_,action))[0]
-                if maxval < v:
-                    v = maxval
-                    optimal_move = action
-            return v, optimal_move
+            return score, optimal_action
+        value = self.max_val
+        for action in env_.get_free_cells():
+            max_value = self._max_value(self._result(env_,action))[0]
+            if max_value < value:
+                value = max_value
+                optimal_action = action
+        return value, optimal_action
 
     # This works in online manner
     def minmax2(self, env):
@@ -115,7 +113,8 @@ class MinMaxBot(Bot):
         elif(env.get_turn() == self.agents[1]): # minimizer
             print("Minimizer")
             return self._min_value(env)[1]
-
+    # ------------------------------------------------------------------------------------
+    
     def plan(self, env):
         env.reset()
         self.minimax(env)
