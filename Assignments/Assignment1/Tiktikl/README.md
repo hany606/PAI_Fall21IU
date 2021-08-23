@@ -4,7 +4,6 @@ It has the same implementation for minimax as in Dots environment, but here the 
 
 ![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Tiks_red.png?raw=true)
 ![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Tiks_red1.png?raw=true)
-![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Dots_red3.png?raw=true)
 ![Visualization](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/tiks1.gif)
 ![Visualization](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/tiks2.gif)
 
