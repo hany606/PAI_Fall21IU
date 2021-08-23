@@ -60,7 +60,7 @@ class MinMaxBot(Bot):
     # For online manner
     def compute_action(self, env, prev_action=None, agent_turn=2):
         agent_turn -= 1
-        action = {self.agents[agent_turn]: [self.minmax2(env)]}
+        action = {self.agents[agent_turn]: [self.compute(env)]}
         return action
     # ------------------------------------------------------------------------------------
     # For testing only: Based on: https://cs50.harvard.edu/ai/2020/notes/0/, https://github.com/wbsth/cs50ai/blob/master/week0/tictactoe/tictactoe.py
@@ -80,7 +80,7 @@ class MinMaxBot(Bot):
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
             return score, optimal_action
         value = self.min_val
-        for action in env_.get_free_cells():
+        for action in env_.get_possible_actions():
             min_value = self._min_value(self._result(env_,action))[0]
             if min_value > value:
                 value = min_value
@@ -94,7 +94,7 @@ class MinMaxBot(Bot):
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
             return score, optimal_action
         value = self.max_val
-        for action in env_.get_free_cells():
+        for action in env_.get_possible_actions():
             max_value = self._max_value(self._result(env_,action))[0]
             if max_value < value:
                 value = max_value
@@ -102,7 +102,7 @@ class MinMaxBot(Bot):
         return value, optimal_action
 
     # This works in online manner
-    def minmax2(self, env):
+    def compute(self, env):
         if env.get_done():
             return None
 
@@ -125,7 +125,7 @@ class MinMaxBot(Bot):
 
         # print(parent)
         # print(env.state_matrix)
-        candidate_solutions = env.get_free_cells()
+        candidate_solutions = env.get_possible_actions()
         # print(depth, len(candidate_solutions))
 
         # print(candidate_solutions)

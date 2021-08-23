@@ -43,6 +43,9 @@ class Dots:
             if(self.agents_id[k] == agent_id):
                 return k
 
+    def get_possible_actions(self):
+        return self.get_free_cells()
+        
     def get_free_cells(self):
         free_cells = []
         for i in range(self.width):
@@ -75,7 +78,9 @@ class Dots:
 
     # Just for testing 
     def get_done(self):
-        if(self.num_steps >= self.max_num_step or len(self.get_free_cells()) == 0):
+        all_score = self.scores[self.agents[0]] + self.scores[self.agents[1]]
+        if(self.num_steps >= self.max_num_step or all_score == self.width*self.height):
+        # if(self.num_steps >= self.max_num_step or len(self.get_free_cells()) == 0):
             return True
         return False
 
@@ -107,7 +112,7 @@ class Dots:
         self.state_matrix[point[0], point[1]] = self.get_agent_id(agent)
         self.network.add_node(point[0], point[1], agent, agent)
 
-        self._add_edges(agent, point, no_update_cycles=no_update_cycles)
+        # self._add_edges(agent, point, no_update_cycles=no_update_cycles)
 
     def _conquer_node(self, agent, point, no_update_cycles=False):
         other_agent = self.get_agent(self.state_matrix[point[0], point[1]])
@@ -153,7 +158,6 @@ class Dots:
                     if(num_intersections % 2 > 0):
                         # print(f"Point: {point} is inside {cycle} for agent {agent}")
                         # print("------------------------------------------------------")
-
                         if(self.state_matrix[i, j] == self.STATE_EMPTY):
                             self._add_node(agent, point, no_update_cycles=True)
                         else:
@@ -182,7 +186,6 @@ class Dots:
 
         # return len(cycles)
 
-    # TODO: if there is a cycle then add all the nodes inside that cycle
     # Actions is dictionary with key the agent id -> agent color
     def _update(self, actions):
         for a in actions.keys():
