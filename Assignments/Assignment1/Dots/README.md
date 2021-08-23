@@ -16,4 +16,16 @@ I have tested with 5x4 env:
 - Max depth: 4, Max width:20 -> worst computation time for single move: ~80 -> Good performance vs random agent
 
 
+With different bad other parameters:
+![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Dots_tie.png?raw=true)
+![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Dots_tie2.png?raw=true)
+
+With x2 speed and 7x7, max_depth=3, max_width=10, random_exploration=True
+![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Dots_red.png?raw=true)
+![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Dots_red2.png?raw=true)
+![Image](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/Dots_red3.png?raw=true)
+![Visualization](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/dots_red1_x2.gif)
+![Visualization](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/dots_red2_x2.gif)
+![Visualization](https://github.com/hany606/PAI_Fall21IU/blob/main/Assignments/Assignment1/figures/dots_red3_x2.gif)
+
 
