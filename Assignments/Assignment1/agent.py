@@ -58,9 +58,9 @@ class MinMaxBot(Bot):
         raise Exception('Did not find a child ??!')
 
     # For online manner
-    def compute_action(self, env, prev_action=None, agent_turn=2):
+    def compute_action(self, env, prev_action=None, agent_turn=2, depth=0, max_depth=3):
         agent_turn -= 1
-        action = {self.agents[agent_turn]: [self.compute(env)]}
+        action = {self.agents[agent_turn]: [self.compute(env, depth, max_depth)]}
         return action
     # ------------------------------------------------------------------------------------
     # For testing only: Based on: https://cs50.harvard.edu/ai/2020/notes/0/, https://github.com/wbsth/cs50ai/blob/master/week0/tictactoe/tictactoe.py
@@ -69,50 +69,48 @@ class MinMaxBot(Bot):
         # print(env_copy.get_turn())
         action_step = {env_copy.get_turn():[action_]}
         _ = env_copy.step(action_step)
-        # print("After",env_copy.get_turn())
-        # env_copy.render(timeout=-0.1)
         return env_copy
 
-    def _max_value(self, env_):
+    def _max_value(self, env_,depth, max_depth=3):
         optimal_action = ()
-        if env_.get_done():
+        if env_.get_done() or depth > max_depth:
             scores = env_.get_scores()
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
             return score, optimal_action
         value = self.min_val
         for action in env_.get_possible_actions():
-            min_value = self._min_value(self._result(env_,action))[0]
+            min_value = self._min_value(self._result(env_,action),depth+1, max_depth)[0]
             if min_value > value:
                 value = min_value
                 optimal_action = action
         return value, optimal_action
 
-    def _min_value(self, env_):
+    def _min_value(self, env_,depth, max_depth=3):
         optimal_action = ()
-        if env_.get_done():
+        if env_.get_done() or depth > max_depth:
             scores = env_.get_scores()
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
             return score, optimal_action
         value = self.max_val
         for action in env_.get_possible_actions():
-            max_value = self._max_value(self._result(env_,action))[0]
+            max_value = self._max_value(self._result(env_,action),depth+1, max_depth)[0]
             if max_value < value:
                 value = max_value
                 optimal_action = action
         return value, optimal_action
 
     # This works in online manner
-    def compute(self, env):
+    def compute(self, env, depth=0, max_depth=3):
         if env.get_done():
             return None
 
         if(env.get_turn() == self.agents[0]): # maximizer
             print("Maximizer")
-            return self._max_value(env)[1]
+            return self._max_value(env,depth+1, max_depth)[1]
 
         elif(env.get_turn() == self.agents[1]): # minimizer
             print("Minimizer")
-            return self._min_value(env)[1]
+            return self._min_value(env,depth+1, max_depth)[1]
     # ------------------------------------------------------------------------------------
     
     def plan(self, env):

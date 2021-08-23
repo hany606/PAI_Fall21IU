@@ -45,7 +45,7 @@ class Dots:
 
     def get_possible_actions(self):
         return self.get_free_cells()
-        
+
     def get_free_cells(self):
         free_cells = []
         for i in range(self.width):
@@ -111,8 +111,7 @@ class Dots:
         self.scores[agent] += 1
         self.state_matrix[point[0], point[1]] = self.get_agent_id(agent)
         self.network.add_node(point[0], point[1], agent, agent)
-
-        # self._add_edges(agent, point, no_update_cycles=no_update_cycles)
+        self._add_edges(agent, point, no_update_cycles=no_update_cycles)
 
     def _conquer_node(self, agent, point, no_update_cycles=False):
         other_agent = self.get_agent(self.state_matrix[point[0], point[1]])
