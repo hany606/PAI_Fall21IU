@@ -1,5 +1,6 @@
 import random
 from copy import deepcopy
+import numpy as np
 
 class Node:
     def __init__(self, parent=None, children=None, value=None, action=None, best_child=None):
@@ -58,9 +59,9 @@ class MinMaxBot(Bot):
         raise Exception('Did not find a child ??!')
 
     # For online manner
-    def compute_action(self, env, prev_action=None, agent_turn=2, depth=0, max_depth=3):
+    def compute_action(self, env, prev_action=None, agent_turn=2, depth=0, max_depth=3, max_width=10, random_explore=False):
         agent_turn -= 1
-        action = {self.agents[agent_turn]: [self.compute(env, depth, max_depth)]}
+        action = {self.agents[agent_turn]: [self.compute(env, depth, max_depth, max_width, random_explore)]}
         return action
     # ------------------------------------------------------------------------------------
     # For testing only: Based on: https://cs50.harvard.edu/ai/2020/notes/0/, https://github.com/wbsth/cs50ai/blob/master/week0/tictactoe/tictactoe.py
@@ -71,46 +72,64 @@ class MinMaxBot(Bot):
         _ = env_copy.step(action_step)
         return env_copy
 
-    def _max_value(self, env_,depth, max_depth=3):
+    def _max_value(self, env_,depth, max_depth=3, max_width=10, random_explore=False):
+        # print(max_depth, max_width, random_explore)
         optimal_action = ()
         if env_.get_done() or depth > max_depth:
             scores = env_.get_scores()
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
             return score, optimal_action
         value = self.min_val
-        for action in env_.get_possible_actions():
-            min_value = self._min_value(self._result(env_,action),depth+1, max_depth)[0]
+
+        action_set_idx = None
+        if(random_explore):
+            action_set_idx = np.random.choice(len(env_.get_possible_actions()), min(max_width, len(env_.get_possible_actions())), replace=False)
+        else:
+            action_set_idx = [i for i in range(min(max_width, len(env_.get_possible_actions())))]
+        # for i in range(min(max_width, len(env_.get_possible_actions()))):
+        for i in action_set_idx:
+            action = env_.get_possible_actions()[i]
+            min_value = self._min_value(self._result(env_,action),depth+1, max_depth, max_width, random_explore)[0]
             if min_value > value:
                 value = min_value
                 optimal_action = action
         return value, optimal_action
 
-    def _min_value(self, env_,depth, max_depth=3):
+    def _min_value(self, env_,depth, max_depth=3, max_width=10, random_explore=False):
+        # print(max_depth, max_width, random_explore)
         optimal_action = ()
         if env_.get_done() or depth > max_depth:
             scores = env_.get_scores()
             score = scores[self.agents[0]] - scores[self.agents[1]]  # if the blue agent is more, then it is positive, if the red agent is more then it is negative
             return score, optimal_action
         value = self.max_val
-        for action in env_.get_possible_actions():
-            max_value = self._max_value(self._result(env_,action),depth+1, max_depth)[0]
+
+        action_set_idx = None
+        if(random_explore):
+            action_set_idx = np.random.choice(len(env_.get_possible_actions()), min(max_width, len(env_.get_possible_actions())), replace=False)
+        else:
+            action_set_idx = [i for i in range(min(max_width, len(env_.get_possible_actions())))]
+        # for i in range(min(max_width, len(env_.get_possible_actions()))):
+        for i in action_set_idx:
+            action = env_.get_possible_actions()[i]
+            max_value = self._max_value(self._result(env_,action),depth+1, max_depth, max_width, random_explore)[0]
             if max_value < value:
                 value = max_value
                 optimal_action = action
         return value, optimal_action
 
     # This works in online manner
-    def compute(self, env, depth=0, max_depth=3):
+    def compute(self, env, depth=0, max_depth=3, max_width=10, random_explore=False):
         if env.get_done():
             return None
 
         if(env.get_turn() == self.agents[0]): # maximizer
             print("Maximizer")
-            return self._max_value(env,depth+1, max_depth)[1]
+            return self._max_value(env, depth+1, max_depth, max_width, random_explore)[1]
 
         elif(env.get_turn() == self.agents[1]): # minimizer
             print("Minimizer")
-            return self._min_value(env,depth+1, max_depth)[1]
+            return self._min_value(env, depth+1, max_depth, max_width, random_explore)[1]
     # ------------------------------------------------------------------------------------
     
     def plan(self, env):

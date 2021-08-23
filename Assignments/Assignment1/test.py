@@ -3,8 +3,8 @@ from agent import MinMaxBot, RandomBot, CycleBot
 from time import sleep, time
 from cs50TicTacToe import TicTacToe
 
-width = 7#15
-height = 7#15
+width = 5#15
+height = 4#15
 dimensions = [width, height]
 node_size = 50
 env = Dots(width=width, height=height, node_size=node_size, max_num_step=9999) # TicTacToe()#
@@ -19,16 +19,22 @@ print("------------ Finished planning ------------")
 done = False
 obs = env.reset()
 print(f"You are {obs['turn']}")
+user_input = ""
 while not done:
 # for i in range(100):
     env.render(timeout=0.1)
     # ------------------------------------ USER ----------------
-    user_input = ""
     break_flag = True
     user_input_flag = True
     while break_flag:
-        user_input = input(f"Please input in the following format x,y or '-' for random: ").strip().replace(' ', '')
-        if(user_input == "-"):
+        if(user_input != "r"):
+            user_input = input(f"Please input in the following format x,y or '-' for random: ").strip().replace(' ', '')
+
+        if(user_input == "q"):
+            print(env.get_scores())
+            exit()
+
+        if(user_input == "-" or user_input == "r"):
             while True:
                 actions = bot_random.compute_action(obs)
                 print("Random bot",actions)
@@ -84,7 +90,7 @@ while not done:
         # actions = bot.compute_action(actions)
         # actions = bot.compute_action(obs, tuple(user_input))
         t1 = time()
-        actions = bot.compute_action(env, depth=0, max_depth=2)
+        actions = bot.compute_action(env, depth=0, max_depth=4, max_width=10, random_explore=False)
         if(actions["red"][0] is None):
             break
         print(f"Time for computation: {time()-t1}")
@@ -102,4 +108,13 @@ print("Finished")
 while True:
     env.render()
     # sleep(1)
-    
+
+
+
+# Max depth is horizon, Max width is obserability
+# Max depth: 5, Max width:30 -> worst computation time for single move -> Too much
+# Max depth: 5, Max width:10 -> worst computation time for single move: ~5s -> not too good
+
+# Max depth: 8, Max width:3 -> worst computation time for single move: ~200s -> but kinda goo 
+# Max depth: 4, Max width:20 -> worst computation time for single move: ~80
+
