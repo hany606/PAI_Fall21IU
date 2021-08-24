@@ -41,7 +41,7 @@ while not done:
     user_input_flag = True
     while break_flag:
         if(user_input != "r"):
-            user_input = input(f"Please input in the following format x,y or '-' for random: ").strip().replace(' ', '')
+            user_input = input(f"Please input in the following format x,y,a_x,a_y or '-' for random or 'r' for random for the rest of the game: ").strip().replace(' ', '')
 
         if(user_input == "q"):
             print(env.get_scores())
@@ -65,18 +65,38 @@ while not done:
             break_flag = True
         else:
             user_input = user_input.split(',')
+            if(len(user_input) != 4):
+                break_flag = True
+                continue
+            # TODO: check if the user cell is actually his cell or not
             for i in range(2):
                 try:
                     user_input[i] = int(user_input[i])
-                    if(user_input[i] >= dimensions[i]):
+                    user_input[i+2] = int(user_input[i+2])
+
+                    if(user_input[i] >= dimensions[i] or user_input[i+2]+user_input[i] >= dimensions[i]):
                         raise ValueError("Bigger than dimensions")
                     break_flag = False
                 except:
                     print("Please enter x and y as integers")
                     break_flag = True
+
+            if(not [tuple(user_input[:2]), tuple(user_input[2:])] in env.get_possible_actions()):
+                break_flag = True
+                print("User input is not possible, action is not suitable or cell is not yours")
+                continue
+
+            # check if the user action is suitable (not diagonal)
+            # if(not 0 in user_input[2:]):
+            #     break_flag = True
+            #     continue
+            # if(not env.state_matrix(*user_input[:2]) == "blue"):
+            #     break_flag = True
+            #     continue
     # ------------------------------------
     if(user_input_flag): # input from the user not random
-        actions = {obs["turn"]: [tuple(user_input)]}
+        # print(user_input)
+        actions = {obs["turn"]: [user_input[:2], user_input[2:]]}
         obs, reward, done, info = env.step(actions)
         if(info["error"] == "not_empty_node"):
             continue
@@ -96,7 +116,9 @@ while not done:
 
     
     env.render(timeout=0.1)
-    
+    if(env.get_winner() is not None):
+        break
+
     while True:
         # actions = bot.compute_action(actions)
         # actions = bot.compute_action(obs, tuple(user_input))
