@@ -3,7 +3,11 @@
 
 ## TODO:
 
-- [ ] Create syntactic constructions, which are similar to correct English speech and are
+- [ ] Add documentation
+- [ ] Ad more test data for rule
+- [ ] Implement compound data for defrule 
+
+- [x] Create syntactic constructions, which are similar to correct English speech and are
 equivalent to:
     
     - [x] deftemplate: 
@@ -14,7 +18,7 @@ equivalent to:
         (slot color) (slot age) (slot name))
     ```
     
-    - [ ] defrule:
+    - [x] defrule:
     
     ```
     If there exists cat named Bob then there exists a cat named Tom.
@@ -22,7 +26,7 @@ equivalent to:
         (cat (name “Bob”)) => (assert (cat (name “Tom”))))
     ```
 
-    - [ ] assert:
+    - [x] assert:
     ```
     There exists a cat with the name Bob.
     (assert (cat (name “Bob”)))
