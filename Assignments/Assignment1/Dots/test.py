@@ -89,7 +89,7 @@ while not done:
         # actions = bot.compute_action(actions)
         # actions = bot.compute_action(obs, tuple(user_input))
         t1 = time()
-        actions = bot.compute_action(env, depth=0, max_depth=3, max_width=10, random_explore=True)
+        actions = bot.compute_action(env, depth=0, max_depth=3, max_width=10, random_explore=False)
         if(actions["red"][0] is None):
             break
         print(f"Time for computation: {time()-t1}")
